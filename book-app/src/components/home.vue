@@ -1,6 +1,16 @@
 <template lang="html">
 
+  
+
+
   <div id="home">
+
+    
+      <div id="heading">
+            <img style="margin-top: -50px" class="image" width="300" height="300" src="../assets/bookLogo.png"> 
+            <h1> Book Looker </h1>
+            <h2>Search by ISBN, Author or Title</h2>
+    </div>
 
     <div id="main">
     
@@ -23,8 +33,8 @@
         </v-layout>
     </v-container>
     </div>
-
-  <div class="list-group-item " style="margin-left: 1vw;  overflow-y: hidden; margin-right: 1vw; margin-bottom: 1vh; " v-for="(book, key) in loopData" v-bind:key="key">
+  
+  <div class="list-group-item " style="margin-left: 1vw; overflow-y: auto; margin-right: 1vw; margin-bottom: 1vh; " v-for="(book, key) in loopData" v-bind:key="key">
 
     <!-- <v-list-item-title
         style="word-break: normal; padding-top: 5px; display: inline-block; font-size: 18px; max-width:45vw"
@@ -163,18 +173,33 @@
 
 <style scoped>
 
+h1{
+  margin-top: -80px;
+  color: black;
+  font-weight: 600;
+}
+
 h2{
   text-align:center;
   color: teal;
   font-weight: 400;
-  margin-top: -40px;  
+  margin-top: 0px;  
 }
 
-#home{
-  padding-top: 50px;
-  position: sticky;
-  top: 0;
+#heading{
+  
+  left: 50%;  
+  text-align: center;
+  margin: 0 auto;
 }
+
+#main{
+  padding-top: 40px;
+}
+
+
+
+
 
 
 </style>>
