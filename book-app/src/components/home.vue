@@ -1,8 +1,7 @@
 <template lang="html">
 
   <div id="home">
-    <h2>Search by ISBN, Author or Title</h2>
-  
+
     <div id="main">
     
     <!-- container with searchbar and button -->
@@ -38,16 +37,14 @@
   </div>
 
 
-<div id="content">
-  
-
-</div>
 
 </div>
 
 </template>
 
 <script lang="js">
+
+
 
 
 
@@ -77,6 +74,7 @@
           url += splitString[i] + "+";
           if(i == splitString.length -1){
             url = url.substring(0, url.length - 1);
+            url = url + "&maxResults=40"
           }
         }
         
@@ -115,20 +113,15 @@ h2{
   text-align:center;
   color: teal;
   font-weight: 400;
-  margin-top: -40px;
-  
+  margin-top: -40px;  
 }
 
-
-
-#main{
-
-padding-top: 40px;
-
-
-
-
+#home{
+  padding-top: 50px;
+  position: sticky;
+  top: 0;
 }
+
 
 </style>>
 
