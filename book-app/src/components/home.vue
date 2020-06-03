@@ -34,62 +34,116 @@
     </v-container>
     </div>
   
-  <div class="list-group-item " style="margin-left: 1vw; overflow-y: auto; margin-right: 1vw; margin-bottom: 1vh; " v-for="(book, key) in loopData" v-bind:key="key">
+  <v-container fluid grid-list-md>
+          <v-layout row wrap>
+            <v-flex
+              xs12
+              md6
+              lg4
+             v-for="(book, key) in loopData" v-bind:key="key"
+            >
+
+  <!-- <div class="list-group-item " style="margin-left: 1vw; margin-right: 1vw; margin-bottom: 1vh; " v-for="(book, key) in loopData" v-bind:key="key"> -->
 
     <!-- <v-list-item-title
         style="word-break: normal; padding-top: 5px; display: inline-block; font-size: 18px; max-width:45vw"
         class=" text-truncate"
         text-truncate
         v-text = "book"
-        
     > </v-list-item-title> -->
 
+ <v-dialog
+      v-model="dialog"
+      width="900"
+      height="600"
+    >
+      <template  v-slot:activator="{ on }">
+        <div style="padding-bottom: 50px;">
+          <v-card
+              
+              v-on="on"
+              class="mx-auto elevation-20"
+              color="#00b9be"
+              dark
+              style="max-width:360px; max-height:350px; min-width:360px; min-height:350px"
+            >
+              <v-row justify="space-between">
+                <v-col cols="8">
+                  <v-card-title primary-title>
+                    <div>
+                      <div style="font-weight: 500; color: white" v-text = "book.volumeInfo.title" class="headline"></div>
+                      <div style="font-weight: 300; color: white" v-text = "book.volumeInfo.authors"></div>
+                      <div style="font-weight: 300; color: white" v-text = "book.volumeInfo.publishedDate"></div>
+                    </div>
+                  </v-card-title>
+                </v-col>
+                <v-img
+                  
+                  contain
+                  :src = "book.volumeInfo.imageLinks.thumbnail"
+                  alt="No image available"
+                  
+                ></v-img>
+              </v-row>
+              <v-divider color="grey"></v-divider>
+              <v-card-actions class="pa-4">
+                
+                <div style="font-size: 14px;" v-text = "book.volumeInfo.industryIdentifiers[1].identifier"></div>
+                <v-spacer></v-spacer>
 
-    <v-card
-    class="mx-auto elevation-20"
-    color="purple"
-    dark
-    style="max-width: 400px;"
-  >
-    <v-row justify="space-between">
-      <v-col cols="8">
-        <v-card-title primary-title>
-          <div>
-            <div v-text = "book.volumeInfo.title" class="headline"></div>
-            <div v-text = "book.volumeInfo.authors"></div>
-            <div v-text = "book.volumeInfo.publishedDate"></div>
-          </div>
+                <div style="font-size: 14px; postion:relative; padding-bottom: 0px; padding-left: 50px" v-text = "book.volumeInfo.ratingsCount" ></div>
+
+                <v-rating
+                  v-model="book.volumeInfo.averageRating"
+                  readonly="readonly"
+                  background-color="white"
+                  color="yellow accent-4"
+                  dense
+                  half-increments
+                  
+                  size="18"
+                ></v-rating>
+              </v-card-actions>
+            </v-card>
+            </div>
+      </template>
+
+      <v-card>
+        <v-card-title
+          class="headline"
+          primary-title
+        >
+          <div style="font-weight: 500; color: Black" v-text = "book.volumeInfo.title" class="headline"></div>
         </v-card-title>
-      </v-col>
-      <v-img
-        class="shrink ma-2"
-        contain
-        src="book.volumeInfo.imageLinks.thumbnail"
-        style="flex-basis: 125px"
-      ></v-img>
-    </v-row>
-    <v-divider dark></v-divider>
-    <v-card-actions class="pa-4">
-      Rate this album
-      <v-spacer></v-spacer>
-      <span class="grey--text text--lighten-2 caption mr-2">
-        <!-- ({{ rating }}) -->
-      </span>
-      <v-rating
-        v-model="rating"
-        background-color="white"
-        color="yellow accent-4"
-        dense
-        half-increments
-        hover
-        size="18"
-      ></v-rating>
-    </v-card-actions>
-  </v-card>
+
+        <v-card-text>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="#00b9be"
+            text
+            @click="dialog = false"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      
+    </v-dialog>
     
-  </div>
 
+    
+    
+  <!-- </div> -->
 
+            </v-flex>
+          </v-layout>
+        </v-container>
 
 </div>
 
@@ -117,6 +171,7 @@
         titles: [],
         searchField: "",
         src: "",
+        rating: 5,
       }
     },
     methods: {
@@ -144,19 +199,42 @@
       },
 
       handleResponse: function() {
-      console.log(this.data);
-      this.titles = [];
-      for (var i = 0; i < this.data.items.length; i++) {
-        var item = this.data.items[i];
-        this.titles.push(item.volumeInfo.title);
-      }
-      this.loopData = [];
-      for (var j = 0; j < this.data.items.length; j++) {
-        var newItem = this.data.items[j];
-        this.loopData.push(newItem);
-        console.log(newItem.volumeInfo.imageLinks.thumbnail);
-      }
-      console.log(this.loopData);
+        console.log(this.data);
+        this.titles = [];
+        for (var i = 0; i < this.data.items.length; i++) {
+          var item = this.data.items[i];
+          this.titles.push(item.volumeInfo.title);
+        }
+        this.loopData = [];
+        for (var j = 0; j < this.data.items.length; j++) {
+          var newItem = this.data.items[j];
+          try{
+            newItem.volumeInfo.authors = newItem.volumeInfo.authors.toString();
+          }catch{
+            console.log("caught");
+          }
+
+          // try{
+          //   if(newItem.volumeInfo.imageLinks.thumbnail = null)
+          //   console.log(image);
+          // }catch{
+          //   newItem.volumeInfo.imageLinks.thumbnail = "https://comnplayscience.eu/app/images/notfound.png";
+          // }
+
+          newItem.volumeInfo.ratingsCount = newItem.volumeInfo.ratingsCount + " Google User Reviews";
+          try{
+            newItem.volumeInfo.industryIdentifiers[0].identifier = "ISBN: " + newItem.volumeInfo.industryIdentifiers[0].identifier;
+          }catch{
+            console.log("caught");
+          }
+          
+          this.loopData.push(newItem);
+  
+          
+        }
+
+
+        console.log(this.loopData);
     }
 
       
