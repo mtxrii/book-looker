@@ -35,9 +35,14 @@
           <v-flex sm1> </v-flex>
           <v-flex sm5 class="list" v-text="code"></v-flex>
           <v-flex sm5 style="text-align: left; padding-top: 10px">
-            <v-btn icon color="#00b9be" v-on:click="copyToClip(code)">
-              <v-icon>fas fa-copy</v-icon>
-            </v-btn>
+            <v-tooltip right>
+              <template v-slot:activator="{ on }">
+                <v-btn icon color="#00b9be" v-on="on" v-on:click="copyToClip(code)">
+                  <v-icon>fas fa-copy</v-icon>
+                </v-btn>
+              </template>
+              <span>copy</span>
+            </v-tooltip>
           </v-flex>
         </v-layout>
       </div>
