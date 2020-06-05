@@ -202,8 +202,11 @@
         for (var j = 0; j < this.data.items.length; j++) {
 
           var newItem = this.data.items[j];
-          // try{
-          newItem.volumeInfo.authors = newItem.volumeInfo.authors.toString();
+          try{
+            newItem.volumeInfo.authors = newItem.volumeInfo.authors.toString();
+          }catch{
+            newItem.volumeInfo.authors = "author unknown";
+          }
           //text trunctation
           if(newItem.volumeInfo.authors.length > 40){
             newItem.volumeInfo.authors = newItem.volumeInfo.authors.slice(0, 40) + '...';
