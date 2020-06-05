@@ -88,7 +88,7 @@
               <v-divider color="grey"></v-divider>
               <v-card-actions class="pa-4">
                 
-                <div style="font-size: 14px;" v-text = "book.volumeInfo.industryIdentifiers[1].identifier"></div>
+                <div style="font-size: 14px;" v-text = "book.volumeInfo.industryIdentifiers[0].identifier"></div>
                 <v-spacer></v-spacer>
 
                 <div style="font-size: 14px; postion:relative; padding-bottom: 0px; padding-left: 50px" v-text = "book.volumeInfo.ratingsCount" ></div>
@@ -182,42 +182,30 @@
 
       getRequest: function(){
 
-        let splitString = this.searchField.split(" ");
-        var url = "https://www.googleapis.com/books/v1/volumes?q=";
-        for (let i=0; i<splitString.length; i++){
-          url += splitString[i] + "+";
-          if(i == splitString.length -1){
-            url = url.substring(0, url.length - 1);
-            url = url + "&maxResults=40"
-          }
-        }
+        let splitString = this.searchField.split(" ").join("+");
+        var url = "https://www.googleapis.com/books/v1/volumes?q=" + splitString + "&maxResults=40";
+        console.log(url);
+        this.loopData = [];
 
         fetch(url)
         .then(data =>{return data.json()})
-        .then(res=>{this.data = res; this.handleResponse()})
+        .then(res =>{this.data = res;
+                     this.handleResponse()})
         // .catch(error=>this.data = "Nothing Found!");   
       },
 
       handleResponse: function() {
         console.log(this.data);
-        this.titles = [];
-        for (var i = 0; i < this.data.items.length; i++) {
-          var item = this.data.items[i];
-          this.titles.push(item.volumeInfo.title);
-        }
-        this.loopData = [];
+
         for (var j = 0; j < this.data.items.length; j++) {
           var newItem = this.data.items[j];
           try{
             newItem.volumeInfo.authors = newItem.volumeInfo.authors.toString();
           }catch{
-            console.log("caught");
+            newItem.volumeInfo.authors = "unknown author";
           }
 
-          // try{
-          //   if(newItem.volumeInfo.imageLinks.thumbnail = null)
-          //   console.log(image);
-          // }catch{
+          // if(newItem.volumeInfo.imageLinks.thumbnail == null)
           //   newItem.volumeInfo.imageLinks.thumbnail = "https://comnplayscience.eu/app/images/notfound.png";
           // }
 
