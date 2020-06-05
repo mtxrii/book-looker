@@ -59,8 +59,8 @@
     >
       <template  v-slot:activator="{ on }">
         <div style="padding-bottom: 50px;">
+           
           <v-card
-              
               v-on="on"
               class="mx-auto elevation-20"
               color="#00b9be"
@@ -71,9 +71,9 @@
                 <v-col cols="8">
                   <v-card-title primary-title>
                     <div>
-                      <div style="font-weight: 500; color: white" v-text = "book.volumeInfo.title" class="headline"></div>
-                      <div style="font-weight: 300; color: white" v-text = "book.volumeInfo.authors"></div>
-                      <div style="font-weight: 300; color: white" v-text = "book.volumeInfo.publishedDate"></div>
+                      <div style="font-weight: 500; color: white; word-break: normal;" v-text = "book.volumeInfo.title" class="headline"></div>
+                      <div style="font-weight: 300; color: white; word-break: normal;" v-text = "book.volumeInfo.authors"></div>
+                      <div style="font-weight: 300; color: white; word-break: normal;" v-text = "book.volumeInfo.publishedDate"></div>
                     </div>
                   </v-card-title>
                 </v-col>
@@ -91,7 +91,7 @@
                 <div style="font-size: 14px;" v-text = "book.volumeInfo.industryIdentifiers[0].identifier"></div>
                 <v-spacer></v-spacer>
 
-                <div style="font-size: 14px; postion:relative; padding-bottom: 0px; padding-left: 50px" v-text = "book.volumeInfo.ratingsCount" ></div>
+                <div style="font-size: 14px; postion:relative; padding-bottom: 0px; padding-left: 50px; word-break: normal;" v-text = "book.volumeInfo.ratingsCount" ></div>
 
                 <v-rating
                   v-model="book.volumeInfo.averageRating"
@@ -112,26 +112,28 @@
         <v-card-title
           class="headline"
           primary-title
+          
         >
-          <div style="font-weight: 500; color: Black" v-text = "book.volumeInfo.title" class="headline"></div>
+          <div style="font-weight: 500; color: Black; word-break: normal;" v-text = "book.volumeInfo.title" class="headline"></div>
         </v-card-title>
 
-        <v-card-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        <v-card-text style="font-size: 15px; font-weight: 500">
+          Description:
+        
+          <div style="font-size: 14px; font-weight: 300; postion:relative; word-break: normal;" v-text = "book.volumeInfo.description" ></div>       
         </v-card-text>
 
         <v-divider></v-divider>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="#00b9be"
-            text
-            @click="dialog = false"
-          >
-            Close
-          </v-btn>
-        </v-card-actions>
+        
+        <v-card-subtitle style="padding-left: -50px; padding-top: 10px; font-size: 15px; font-weight: 500; word-break: normal;">
+            Buy on Amazon
+        </v-card-subtitle>
+        
+          
+       
+
+
       </v-card>
       
     </v-dialog>
@@ -198,18 +200,28 @@
         console.log(this.data);
 
         for (var j = 0; j < this.data.items.length; j++) {
+
           var newItem = this.data.items[j];
-          try{
-            newItem.volumeInfo.authors = newItem.volumeInfo.authors.toString();
-          }catch{
-            newItem.volumeInfo.authors = "unknown author";
+          // try{
+          newItem.volumeInfo.authors = newItem.volumeInfo.authors.toString();
+          //text trunctation
+          if(newItem.volumeInfo.authors.length > 40){
+            newItem.volumeInfo.authors = newItem.volumeInfo.authors.slice(0, 40) + '...';
+            
+          }
+          
+          if(newItem.volumeInfo.title.length > 50){
+            newItem.volumeInfo.title = newItem.volumeInfo.title.slice(0,50) + '...';
           }
 
-          // if(newItem.volumeInfo.imageLinks.thumbnail == null)
-          //   newItem.volumeInfo.imageLinks.thumbnail = "https://comnplayscience.eu/app/images/notfound.png";
-          // }
+        
 
-          newItem.volumeInfo.ratingsCount = newItem.volumeInfo.ratingsCount + " Google User Reviews";
+          if(newItem.volumeInfo.ratingsCount){
+            newItem.volumeInfo.ratingsCount = newItem.volumeInfo.ratingsCount + " Google User Reviews";
+          }else{
+            newItem.volumeInfo.ratingsCount = "No" + " Google User Reviews";
+          }
+
           try{
             newItem.volumeInfo.industryIdentifiers[0].identifier = "ISBN: " + newItem.volumeInfo.industryIdentifiers[0].identifier;
           }catch{
