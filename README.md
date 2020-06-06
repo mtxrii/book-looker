@@ -7,7 +7,7 @@ A sleek web app with the express purpose of looking up books.
 This app uses the Google Books API to return and display a list of book requests. While it is not a search engine of its own, it does provide an elegant view of the Google Books virtual library, and has some nice tools regarding ISBNs. This project has mainly served us as practice for creating web apps and using Json APIs.
 
 ### Usage
-To find books, simply input a title, author or ISBN, and the closest results will be displayed in card format.
+To find books, simply input a title, author or ISBN, and the closest results will be displayed in card format. Clicking on a book card displays a description of the book with a link at the bottom to search for it on amazon.
 
 <img src="https://i.imgur.com/VTptbQY.png" width=60%>
 
