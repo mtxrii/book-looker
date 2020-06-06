@@ -112,7 +112,7 @@
               <v-divider color="grey"></v-divider>
               <v-card-actions class="pa-4">
                 
-                <div style="font-size: 14px;" v-text = "book.volumeInfo.industryIdentifiers[0].identifier"></div>
+                <div style="font-size: 14px; white-space: pre;" v-text = "book.volumeInfo.industryIdentifiers[0].identifier + '\n' + book.volumeInfo.industryIdentifiers[1].identifier"></div>
                 <v-spacer></v-spacer>
 
                 <div style="font-size: 14px; postion:relative; padding-bottom: 0px; padding-left: 50px; word-break: normal;" v-text = "book.volumeInfo.ratingsCount" ></div>
@@ -195,6 +195,8 @@
         src: "",
         rating: 5,
 
+        singleResult: false,
+
         fab: false,
         invalidISBN: "",
         hint: true,
@@ -210,18 +212,22 @@
 
       getRequest: function(){
 
+        let maxResults = "&maxResults=40";
+
         const isbn = this.searchField.split("-").join("");
         if ((isbn.length === 10 || isbn.length === 13) && !isNaN(isbn.replace("X", "0"))) {
           if (!this.isValidISBN(isbn)) {
             this.invalidISBN = "THIS IS NOT A VALID ISBN.";
             return;
           }
+          this.singleResult = true;
+          maxResults = "&maxResults=1";
         }
 
         this.loading = true;
 
         let splitString = this.searchField.split(" ").join("+");
-        var url = "https://www.googleapis.com/books/v1/volumes?q=" + splitString + "&maxResults=40";
+        var url = "https://www.googleapis.com/books/v1/volumes?q=" + splitString + maxResults;
         console.log(url);
         this.loopData = [];
         this.invalidISBN = "";
@@ -263,14 +269,43 @@
             newItem.volumeInfo.ratingsCount = "No" + " Google User Reviews";
           }
 
+          let isbn10 = "";
+          let isbn13 = "";
+
           try{
-            newItem.volumeInfo.industryIdentifiers[0].identifier = "ISBN: " + newItem.volumeInfo.industryIdentifiers[0].identifier;
+            let identifier0 = newItem.volumeInfo.industryIdentifiers[0].identifier;
+            let type0 = newItem.volumeInfo.industryIdentifiers[0].type;
+
+            if (type0 == "ISBN_10") {
+              isbn10 = "ISBN (10 DIGIT):\n" + identifier0;
+            }
+            if (type0 == "ISBN_13") {
+              isbn13 = "ISBN (13 DIGIT):\n" + identifier0;
+            }
           }catch{
-            console.log("caught");
+            console.log("NO ISBN[0] PROVIDED");
           }
+
+          try{
+            let identifier1 = newItem.volumeInfo.industryIdentifiers[1].identifier;
+            let type1 = newItem.volumeInfo.industryIdentifiers[1].type;
+
+            if (type1 == "ISBN_10") {
+              isbn10 = "ISBN (10 DIGIT):\n" + identifier1;
+            }
+            if (type1 == "ISBN_13") {
+              isbn13 = "ISBN (13 DIGIT):\n" + identifier1;
+            }
+          }catch{
+            console.log("NO ISBN[1] PROVIDED");
+          }
+
+          newItem.volumeInfo.industryIdentifiers[0].identifier = isbn10;
+          newItem.volumeInfo.industryIdentifiers[1].identifier = isbn13;
           
+
+
           this.loopData.push(newItem);
-  
           
         }
 
