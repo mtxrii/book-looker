@@ -1,6 +1,8 @@
 # Book Looker
 A sleek web app with the express purpose of looking up books.
 
+Check it out at [books.edavalos.com](https://books.edavalos.com/) or [books.ezramoussa.com](https://books.ezramoussa.com/)
+
 <img src="https://i.imgur.com/pzXgpCP.png" width=60%>
 
 ## Background
