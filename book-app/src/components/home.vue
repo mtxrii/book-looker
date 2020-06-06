@@ -76,21 +76,22 @@
         v-text = "book"
     > </v-list-item-title> -->
 
-    <v-dialog
-      v-model="dialog"
-      width="900"
-      height="600"
-    >
+      <v-dialog
+        v-model="dialog"
+        width="900"
+        height="600"
+      >
       <template  v-slot:activator="{ on }">
         <div style="padding-bottom: 50px;">
            
-          <v-card
+            <!-- Multi-result, 1/3 width card -->
+            <v-card v-if="!singleResult" 
               v-on="on"
               class="mx-auto elevation-20"
               color="#00b9be"
               dark
               style="max-width:360px; max-height:350px; min-width:360px; min-height:350px"
-            >
+             >
               <v-row justify="space-between">
                 <v-col cols="8">
                   <v-card-title primary-title>
@@ -129,7 +130,53 @@
                 ></v-rating>
               </v-card-actions>
             </v-card>
-            </div>
+            
+            <!-- Single-result, full width card -->
+            <v-card v-if="singleResult" 
+              v-on="on"
+              class="mx-auto elevation-20"
+              color="#00b9be"
+              dark
+            >
+              <v-row justify="space-between" v-if="book.show">
+                <v-col cols="8">
+                  <v-card-title primary-title>
+                    <div>
+                      <div style="font-weight: 500; color: white; word-break: normal;" v-text = "book.volumeInfo.title" class="headline"></div>
+                      <div style="font-weight: 300; color: white; word-break: normal;" v-text = "book.volumeInfo.authors"></div>
+                      <div style="font-weight: 300; color: white; word-break: normal;" v-text = "book.volumeInfo.publishedDate"></div>
+                    </div>
+                  </v-card-title>
+                </v-col>
+                <v-img
+                  
+                  contain
+                  :src = "book.volumeInfo.imageLinks.thumbnail"
+                  alt="No image available"
+                  
+                ></v-img>
+              </v-row>
+              <v-divider color="grey" v-if="book.show"></v-divider>
+              <v-card-actions class="pa-4" v-if="book.show">
+                
+                <div style="font-size: 14px; white-space: pre;" v-text = "book.volumeInfo.industryIdentifiers[0].identifier + '\n' + book.volumeInfo.industryIdentifiers[1].identifier"></div>
+                <v-spacer></v-spacer>
+
+                <div style="font-size: 14px; postion:relative; padding-bottom: 0px; padding-left: 50px; word-break: normal;" v-text = "book.volumeInfo.ratingsCount" ></div>
+
+                <v-rating
+                  v-model="book.volumeInfo.averageRating"
+                  readonly="readonly"
+                  background-color="white"
+                  color="yellow accent-4"
+                  dense
+                  half-increments
+                  
+                  size="18"
+                ></v-rating>
+              </v-card-actions>
+            </v-card>
+          </div>
       </template>
 
       <v-card>
@@ -150,26 +197,28 @@
         <v-divider></v-divider>
 
         
-        <v-card-subtitle style="padding-left: -50px; padding-top: 10px; font-size: 15px; font-weight: 500; word-break: normal;">
-            Buy on Amazon
-        </v-card-subtitle>
+        <v-btn tile outlined :href="book.volumeInfo.amazon" target="_blank" style="padding-left: -50px; padding-top: 10px; font-size: 15px; font-weight: 500; word-break: normal;">
+            <v-icon left>fas fa-shopping-basket</v-icon> Buy on Amazon
+        </v-btn>
         
           
        
 
 
-      </v-card>
+        </v-card>
       
-    </v-dialog>
+      </v-dialog>
     
 
     
     
-  <!-- </div> -->
 
-            </v-flex>
-          </v-layout>
-        </v-container>
+        </v-flex>
+      </v-layout>
+    </v-container>
+
+
+    
 
 </div>
 
@@ -213,21 +262,22 @@
       getRequest: function(){
 
         let maxResults = "&maxResults=40";
+        this.singleResult = false;
 
         const isbn = this.searchField.split("-").join("");
         if ((isbn.length === 10 || isbn.length === 13) && !isNaN(isbn.replace("X", "0"))) {
+          this.singleResult = true;
           if (!this.isValidISBN(isbn)) {
             this.invalidISBN = "THIS IS NOT A VALID ISBN.";
             return;
           }
-          this.singleResult = true;
           maxResults = "&maxResults=1";
         }
 
         this.loading = true;
 
-        let splitString = this.searchField.split(" ").join("+");
-        var url = "https://www.googleapis.com/books/v1/volumes?q=" + splitString + maxResults;
+        const splitString = this.searchField.split(" ").join("+");
+        let url = "https://www.googleapis.com/books/v1/volumes?q=" + splitString + maxResults;
         console.log(url);
         this.loopData = [];
         this.invalidISBN = "";
@@ -242,6 +292,10 @@
       handleResponse: function() {
         console.log(this.data);
         this.loading = false;
+
+        if (this.data.items.length == 1) {
+          this.singleResult = true;
+        }
 
         for (var j = 0; j < this.data.items.length; j++) {
 
@@ -261,7 +315,7 @@
             newItem.volumeInfo.title = newItem.volumeInfo.title.slice(0,50) + '...';
           }
 
-        
+          newItem.volumeInfo.amazon = "https://www.amazon.com/s?k=" + newItem.volumeInfo.title.split(' ').join('+') + "&i=stripbooks&ref=nb_sb_noss_2";
 
           if(newItem.volumeInfo.ratingsCount){
             newItem.volumeInfo.ratingsCount = newItem.volumeInfo.ratingsCount + " Google User Reviews";
@@ -303,10 +357,19 @@
           newItem.volumeInfo.industryIdentifiers[0].identifier = isbn10;
           newItem.volumeInfo.industryIdentifiers[1].identifier = isbn13;
           
-
+          newItem.show = true;
 
           this.loopData.push(newItem);
           
+        }
+
+        // spacers are cards that wont show up, to allow centering.
+        // indicate a spacer by setting book.show to false.
+        if (this.singleResult) {
+          let spacer = JSON.parse(JSON.stringify(this.loopData[0]));
+          spacer.show = false;
+          this.loopData.unshift(spacer);
+          this.loopData.push(spacer);
         }
 
 
@@ -333,18 +396,47 @@
           return false;
         }
 
-        let x = 0;
-        for (var i = num.length; i > 0; i--) {
-          if (num[x] == "X") {
-            sum = sum + (i * 10);
+        if (num.length === 10) {
+          let x = 0;
+          for (let i = num.length; i > 0; i--) {
+            if (num[x] == "X") {
+              sum = sum + (i * 10);
+            }
+            else {
+              sum = sum + (i * parseInt(num[x]));
+            }
+            x++;
           }
-          else {
-            sum = sum + (i * parseInt(num[x]));
-          }
-          x++;
+
+          return (sum % 11 === 0);
         }
 
-        return (sum % 11 === 0);
+        else {
+          let x = true;
+          for (let i = 0; i < num.length; i++) {
+            if (num[i] == "X") {
+              if (x) {
+                sum = sum + 10;
+                x = !x;
+              }
+              else {
+                sum = sum + 30;
+                x = !x;
+              }
+            }
+            else {
+              if (x) {
+                sum = sum + parseInt(num[i]);
+                x = !x;
+              }
+              else {
+                sum = sum + (3 * parseInt(num[i]));
+                x = !x;
+              }
+            }
+          }
+          return (sum % 10 === 0);
+        }
       },
 
       
